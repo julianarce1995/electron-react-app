@@ -16,13 +16,13 @@ function createMainWindow() {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = dirname(__filename);
   mainWindow = new BrowserWindow({
-    title: 'My buddy app',
-    width: 1000,
-    height: 800,
+    title: 'Electron React App',
+    width: 1920,
+    height: 1080,
     webPreferences: {
       contextIsolation: true,
-      nodeIntegration: false,
-      preload: join(__dirname, 'preload.js'),
+      nodeIntegration: true,
+      preload: join(__dirname, 'preload.cjs'),
     },
   });
 
@@ -122,7 +122,6 @@ async function connection() {
   try {
     const dbPath = join(process.cwd(), 'app.db');
 
-    // Crear una nueva conexión a la base de datos o crear una nueva
     db = new Database(dbPath, (err) => {
       if (err) {
         console.error('Error al conectar a la base de datos', err.message);
@@ -153,8 +152,6 @@ async function insertEntity(name) {
 }
 
 ipcMain.handle('get-data', async (event, table) => {
-  console.log("careedkdkkdkdk");
-  
   const query = `SELECT * FROM ${table}`;
   return new Promise((resolve, reject) => {
     db.all(query, [], (err, rows) => {
@@ -191,15 +188,13 @@ ipcMain.handle('read-excel', async (event, filePath) => {
 });
 
 ipcMain.handle("select-file", async () => {
-  console.log("alksdfhklasdfhlkashdflk");
-  
   const result = await dialog.showOpenDialog({
     properties: ["openFile"],
     filters: [{ name: "Excel Files", extensions: ["xls", "xlsx"] }],
   });
 
   if (result.canceled) {
-    return null; // Usuario canceló la selección
+    return null;
   }
-  return result.filePaths[0]; // Devuelve la ruta del archivo seleccionado
+  return result.filePaths[0];
 });

@@ -1,25 +1,54 @@
-import logo from './logo.svg';
-import './App.css';
+import { RouterProvider, createBrowserRouter, createMemoryRouter } from "react-router-dom";
+
+import "./App.css";
+
+import Home from "./pages/Home.js";
+import Upload from "./pages/Upload.js";
+import Insert from "./pages/Insert.js";
+import Info from "./pages/Info.js";
+import Work from "./pages/Work.js";
+
+const ErrorPage = () => (
+  <div>
+    <h1>¡Ups! Algo salió mal.</h1>
+    <p>No pudimos encontrar esta página.</p>
+  </div>
+);
+
+const routes = createBrowserRouter([
+  {
+    path: "/",
+    element: <Home />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "/work",
+    element: <Work />,
+  },
+  {
+    path: "/upload",
+    element: <Upload />,
+  },
+  {
+    path: "/insert",
+    element: <Insert />,
+  },
+  {
+    path: "/info",
+    element: <Info />,
+  },
+  {
+    path: "*",
+    element: <ErrorPage />,
+  },
+]);
+
+const router = createMemoryRouter(routes, {
+  initialEntries: ["/"], // Rutas iniciales (opcional)
+});
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;
