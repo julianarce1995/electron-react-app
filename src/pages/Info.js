@@ -1,17 +1,20 @@
 import React, { useState } from "react";
 
 const Info = () => {
-  const [table, setTable] = useState("");
+  const [tableSelected, setTableSelected] = useState("");
+  const [columnsNames, setColumnsNames] = useState([]);
   const [dataTable, setDataTable] = useState([]);
 
-  const handleTableChange = (event) => {
-    setTable(event.target.value);
+  const handleSelectTableChange = (event) => {
+    setTableSelected(event.target.value);
   };
 
   async function getData() {
     try {
-      const data = await window.database.getData(table);
-      setDataTable(data);
+      const tableInfo = await window.database.getData(tableSelected);
+      const columns = Object.keys(tableInfo[0]);
+      setColumnsNames(columns);
+      setDataTable(tableInfo);
     } catch (error) {
       console.log(error);
     }
@@ -23,13 +26,13 @@ const Info = () => {
         <div className="max-w-sm mx-auto flex flex-col items-center">
           <div className="w-full">
             <label className="mb-2 text-sm font-medium text-gray-900">
-              Select table
+              Selecciona la tabla
             </label>
             <select
               id="countries"
-              value={table}
+              value={tableSelected}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 flex w-full p-2.5"
-              onChange={handleTableChange}
+              onChange={handleSelectTableChange}
             >
               <option value=""></option>
               <option value="Entidad">Entidad</option>
@@ -50,31 +53,35 @@ const Info = () => {
           </button>
         </div>
 
-        <div className="m-8">
-          {dataTable.length ? (
-            <span className="px-4 pt-2 pb-1 text-xs text-gray-300 uppercase rounded-t-lg bg-gray-700 text-gray-400">
-              {table}
-            </span>
-          ) : null}
-          <div className="relative overflow-x-auto">
-            <table className="w-fit text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-              <tbody>
-                {dataTable.map((item, index) => {
-                  return (
-                    <tr key={index} className="bg-white border-b">
-                      <th
-                        key={index}
-                        scope="col"
-                        className="px-8 py-2 font-medium"
-                      >
-                        {item.Nombre}
-                      </th>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+        <div className="flex justify-center m-8">
+          <table className="w-fit text-sm text-left rtl:text-right text-gray-500">
+            <thead className="w-fit text-sm text-gray-500">
+              <tr>
+                {columnsNames.map((column, index) => (
+                  <th
+                    key={index}
+                    className="px-8 py-2 text-sm text-gray-100 uppercase rounded-t-lg bg-gray-700 text-gray-400"
+                  >
+                    {column}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {dataTable.map((item, index) => (
+                <tr key={index} className="bg-white border-b">
+                  {columnsNames.map((column, colIndex) => (
+                    <td
+                      key={colIndex}
+                      className="px-8 py-2 font-medium border-x-1"
+                    >
+                      {item[column]}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
