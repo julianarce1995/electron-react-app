@@ -3,7 +3,7 @@ import { NavBar } from "./Navbar.js";
 
 const Layout = ({children}) => {
   return (
-    <div className="w-full h-full scrollable-container">
+    <div className="w-full h-full">
       <NavBar />
       <div className="container w-full mx-auto my-32">{children}</div>
     </div>

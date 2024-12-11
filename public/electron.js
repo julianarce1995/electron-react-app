@@ -59,33 +59,60 @@ function createTable() {
           const createTables = `
             CREATE TABLE IF NOT EXISTS Entidad (
               ID INTEGER PRIMARY KEY AUTOINCREMENT,
-              Name TEXT NOT NULL
+              Nombre TEXT NOT NULL
             );
 
             CREATE TABLE IF NOT EXISTS Sede (
               ID INTEGER PRIMARY KEY AUTOINCREMENT,
-              Name TEXT NOT NULL,
+              Nombre TEXT NOT NULL,
               IdEntidad INTEGER NOT NULL,
               FOREIGN KEY (IdEntidad) REFERENCES Entidad(ID)
             );
 
             CREATE TABLE IF NOT EXISTS Grupo (
               ID INTEGER PRIMARY KEY AUTOINCREMENT,
-              Name TEXT NOT NULL,
+              Nombre TEXT NOT NULL,
               IdSede INTEGER NOT NULL,
-              FOREIGN KEY (IdSede) REFERENCES Sede(ID)
+              IdJornada INTEGER NOT NULL,
+              IdProfesor INTEGER NOT NULL,
+              FOREIGN KEY (IdSede) REFERENCES Sede(ID),
+              FOREIGN KEY (IdJornada) REFERENCES Jornada(ID),
+              FOREIGN KEY (IdProfesor) REFERENCES Profesor(ID)
+            );
+
+            CREATE TABLE IF NOT EXISTS Profesor (
+              ID INTEGER PRIMARY KEY AUTOINCREMENT,
+              Nombre TEXT NOT NULL,
+              Telefono TEXT NOT NULL UNIQUE,
+              Email TEXT NOT NULL UNIQUE
             );
 
             CREATE TABLE IF NOT EXISTS Brigada (
               ID INTEGER PRIMARY KEY AUTOINCREMENT,
-              Name TEXT NOT NULL,
-              Fecha TEXT NOT NULL
+              Nombre TEXT NOT NULL,
+              Fecha TEXT NOT NULL,
+              IdJornada INTEGER NOT NULL,
+              FOREIGN KEY (IdJornada) REFERENCES Jornada(ID)
+            );
+
+            CREATE TABLE IF NOT EXISTS Jornada (
+              ID INTEGER PRIMARY KEY AUTOINCREMENT,
+              Nombre TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS Sexo (
+              ID INTEGER PRIMARY KEY AUTOINCREMENT,
+              Tipo TEXT NOT NULL
             );
 
             CREATE TABLE IF NOT EXISTS Estudiante (
               ID INTEGER PRIMARY KEY AUTOINCREMENT,
-              Name TEXT NOT NULL,
-              Edad INTEGER NOT NULL
+              Nombre TEXT NOT NULL,
+              Edad INTEGER NOT NULL,
+              DocumentoIdentidad TEXT NOT NULL UNIQUE,
+              Telefono TEXT NOT NULL UNIQUE,
+              IdSexo INTEGER NOT NULL,
+              FOREIGN KEY (IdSexo) REFERENCES Sexo(ID)
             );
 
             CREATE TABLE IF NOT EXISTS Info (
@@ -140,14 +167,24 @@ async function connection() {
 }
 
 
-async function insertEntity(name) {
-  const query = `INSERT INTO Entidad (Name) VALUES (?);`;
-  db.run(query, [name], (err) => {
-    if (err) {
-      console.error('Error ejecutando la consulta:', err.message);
-    } else {
-      console.log('Consulta ejecutada correctamente');
-    }
+async function insertData(tableName, fields, values) {
+  // Construimos el string de campos y placeholders dinámicamente
+  const placeholders = fields.map(() => "?").join(", "); // Ejemplo: "?, ?, ?"
+  const query = `INSERT INTO ${tableName} (${fields.join(
+    ", "
+  )}) VALUES (${placeholders});`;
+
+  // Ejecutamos el query con los valores
+  return new Promise((resolve, reject) => {
+    db.run(query, values, function (err) {
+      if (err) {
+        console.error("Error ejecutando la consulta:", err.message);
+        reject(err);
+      } else {
+        console.log("Consulta ejecutada correctamente");
+        resolve(this.lastID); // Retorna el ID del último registro insertado
+      }
+    });
   });
 }
 
@@ -165,9 +202,9 @@ ipcMain.handle('get-data', async (event, table) => {
   });
 });
 
-ipcMain.handle('create-data', async (event, name) => {
+ipcMain.handle("create-data", async (event, tableName, fields, values) => {
   try {
-    await insertEntity(name);
+    await insertData(tableName, fields, values);
   } catch (error) {
     console.error("Error al crear info:", error);
     throw error;

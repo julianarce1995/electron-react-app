@@ -1,8 +1,9 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
-contextBridge.exposeInMainWorld('connection', {
-  getData: (table) => ipcRenderer.invoke('get-data', table),
-  createData: (name) => ipcRenderer.invoke('create-data', name),
+contextBridge.exposeInMainWorld("database", {
+  getData: (table) => ipcRenderer.invoke("get-data", table),
+  createData: (tableName, fields, values) =>
+    ipcRenderer.invoke("create-data", tableName, fields, values),
 });
 
 contextBridge.exposeInMainWorld("electron", {

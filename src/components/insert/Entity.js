@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 
-const Home = () => {
-  const [entidad, setEntidad] = useState("");
+const InsertEntity = () => {
+  const [entityName, setEntity] = useState("");
 
-  const handleEntityChange = (event) => {
-    setEntidad(event.target.value);
+  const handleEntityNameChange = (event) => {
+    setEntity(event.target.value);
   };
+
   async function insertData() {
     try {
-      await window.database.createData("Entidad",["Name"],entidad);
+      await window.database.createData("Entidad",["Nombre"],[entityName]);
     } catch (error) {
       console.log(error);
     }
@@ -18,15 +19,15 @@ const Home = () => {
     <div>
       <div className="max-w-sm mx-auto flex flex-col items-center">
         <div className="w-full">
-          <label className="text-sm font-medium text-gray-900">Entidad.</label>
+          <label className="text-sm font-medium text-gray-900">Entidad:</label>
           <input
-            id="entidad"
+            id="entityName"
             type="text"
-            name="entidad"
-            value={entidad}
-            placeholder="ejemplo: confama"
+            name="entityName"
+            value={entityName}
+            placeholder="ejemplo: Confama"
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 flex w-full p-2.5"
-            onChange={handleEntityChange}
+            onChange={handleEntityNameChange}
           />
         </div>
         <button
@@ -42,4 +43,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default InsertEntity;

@@ -35,7 +35,7 @@ export const NavBar = () => {
                 </NavLink>
               </li>
               <li
-                className={`hover:bg-gray-200 ${
+                className={`${
                   activeButton === "2"
                     ? "bg-gray-400 text-white"
                     : "hover:bg-gray-200"
